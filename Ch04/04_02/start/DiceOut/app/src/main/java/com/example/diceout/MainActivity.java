@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.IntStream;
@@ -95,13 +96,11 @@ public class MainActivity extends AppCompatActivity {
     public void rollDice(View v) {
         viewRollResult.setText("Clicked!");
 
-        // Reset previous state
-        int score = 0;
+        ArrayList<Integer> allRollValues = new ArrayList<>();
 
         StringBuilder messageBuilder = new StringBuilder();
         messageBuilder.append("You rolled");
-
-        for (int dieIndex = 0; dieIndex < DICE_COUNT; dieIndex++) {
+        IntStream.range(0, DICE_COUNT).forEachOrdered(dieIndex -> {
             String formatString;
             if (dieIndex == 0) {
                 formatString = " a %d";
@@ -110,15 +109,20 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 formatString = ", a %d";
             }
-
             int rollValue = dice.get(dieIndex).getRoll();
+            allRollValues.add(rollValue);
             messageBuilder.append(String.format(formatString, rollValue));
-            score += rollValue;
-        }
+        });
+
+        // Update Score
 
         // Update the app to display the result value
         viewRollResult.setText(messageBuilder.toString());
-        viewScoreText.setText(String.format("Score: %d", score));
+        viewScoreText.setText(String.format("Score: %d", computScore(allRollValues)));
+    }
+
+    private int computScore(ArrayList<Integer> allRollValues) {
+        return -1;
     }
 
     @Override
