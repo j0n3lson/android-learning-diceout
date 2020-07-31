@@ -26,20 +26,15 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
 public class MainActivity extends AppCompatActivity {
-    // Field to hold the roll result text
-    TextView rollResult;
-
-    // Field to hold the roll button
-    Button rollButton;
-
-    // Field to hold the score
-    int score;
-
-    // Field to hold the score
-    Random rand;
-
     static final int DICE_COUNT = 3;
     static final int MAX_FACE_VALUE = 6;
+
+    // View Objects
+    TextView viewRollResult;
+    TextView viewScoreText;
+    Button rollButton;
+
+    // Model Objects
     List<Die> dice;
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -59,9 +54,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Field initialization here
-        score = 0;
-        rollResult = (TextView) findViewById(R.id.rollResult);
+        viewRollResult = (TextView) findViewById(R.id.rollResult);
+        viewScoreText = (TextView) findViewById(R.id.scoreText);
         rollButton = (Button) findViewById(R.id.rollButton);
 
         // Load all the images at once.
@@ -99,12 +93,15 @@ public class MainActivity extends AppCompatActivity {
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     public void rollDice(View v) {
-        rollResult.setText("Clicked!");
+        viewRollResult.setText("Clicked!");
 
-        // Set dice values into an ArrayList
+        // Reset previous state
+        int score = 0;
+
         StringBuilder messageBuilder = new StringBuilder();
         messageBuilder.append("You rolled");
-        IntStream.range(0, DICE_COUNT).forEachOrdered(dieIndex -> {
+
+        for (int dieIndex = 0; dieIndex < DICE_COUNT; dieIndex++) {
             String formatString;
             if (dieIndex == 0) {
                 formatString = " a %d";
@@ -113,11 +110,15 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 formatString = ", a %d";
             }
-            messageBuilder.append(String.format(formatString, dice.get(dieIndex).getRoll()));
-        });
+
+            int rollValue = dice.get(dieIndex).getRoll();
+            messageBuilder.append(String.format(formatString, rollValue));
+            score += rollValue;
+        }
 
         // Update the app to display the result value
-        rollResult.setText(messageBuilder.toString());
+        viewRollResult.setText(messageBuilder.toString());
+        viewScoreText.setText(String.format("Score: %d", score));
     }
 
     @Override
