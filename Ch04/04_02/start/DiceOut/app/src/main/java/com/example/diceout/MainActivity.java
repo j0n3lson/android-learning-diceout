@@ -1,5 +1,6 @@
 package com.example.diceout;
 
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
@@ -15,12 +16,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
-import java.util.function.Function;
 import java.util.stream.IntStream;
 
 import static java.util.stream.Collectors.toList;
@@ -39,8 +38,8 @@ public class MainActivity extends AppCompatActivity {
     // Field to hold the score
     Random rand;
 
-    // List to hold all die
-    static final int DICE_COUNT=3;
+    static final int DICE_COUNT = 3;
+    static final int MAX_FACE_VALUE = 6;
     List<Die> dice;
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -65,18 +64,41 @@ public class MainActivity extends AppCompatActivity {
         rollResult = (TextView) findViewById(R.id.rollResult);
         rollButton = (Button) findViewById(R.id.rollButton);
 
-       dice= IntStream.range(1, DICE_COUNT+1).mapToObj(diceIndex ->
+        // Load all the images at once.
+        List<Drawable> imageCache = IntStream.range(1, MAX_FACE_VALUE+1).mapToObj(faceValue -> loadImageFile(faceValue)).collect(toList());
+
+        // Create the die and pass in a reference to the view they will update and the images
+        // that can be updated to. Die know how to roll and update their corresponding view.
+        dice = IntStream.range(1, DICE_COUNT + 1).mapToObj(
+                diceIndex ->
                 {
-                    int id = getResources().getIdentifier("die"+diceIndex+"Image","id", getPackageName());
-                    return Die.create(diceIndex, (ImageView) findViewById(id));
+                    String resourceName = String.format("die%dImage", diceIndex);
+                    return Die.create(findViewByName(resourceName), imageCache);
                 }
-                ).collect(toList());
+        ).collect(toList());
 
         Toast.makeText(getApplicationContext(), "Welcome to DiceOut!", Toast.LENGTH_LONG).show();
     }
 
+    private ImageView findViewByName(String resourceName) {
+        int id = getResources().getIdentifier(resourceName, "id", getPackageName());
+        return (ImageView) findViewById(id);
+    }
+
+    private Drawable loadImageFile(int faceValue) {
+        String fileName = String.format("die_%d.png", faceValue);
+        try {
+            InputStream stream = getAssets().open(fileName);
+            return Drawable.createFromStream(stream, null);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        // Should never reach here.
+        return null;
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.N)
-    public void rollDice(View v){
+    public void rollDice(View v) {
         rollResult.setText("Clicked!");
 
         // Set dice values into an ArrayList
@@ -84,9 +106,9 @@ public class MainActivity extends AppCompatActivity {
         messageBuilder.append("You rolled");
         IntStream.range(0, DICE_COUNT).forEachOrdered(dieIndex -> {
             String formatString;
-            if(dieIndex == 0){
-                formatString = "a %d";
-            } else if(dieIndex == DICE_COUNT-1){
+            if (dieIndex == 0) {
+                formatString = " a %d";
+            } else if (dieIndex == DICE_COUNT - 1) {
                 formatString = ", and a %d.";
             } else {
                 formatString = ", a %d";
@@ -121,29 +143,30 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private static class Die {
-        private static final int MAX_DIE_VALUE = 6;
-        private static Random rand = new Random(MAX_DIE_VALUE);
-
-        int currentValue;
-        String name;
+        private static final Random rand = new Random(MainActivity.MAX_FACE_VALUE);
+        private final List<Drawable> imageCache;
+        int faceValue;
         ImageView imageView;
 
-        public Die(String name, ImageView imageView) {
-            this.name = name;
+        private Die(ImageView imageView, List<Drawable> imageCache) {
+            faceValue = 1;
             this.imageView = imageView;
+            this.imageCache = imageCache;
         }
 
-        public static Die create(int diceIndex, ImageView imageView) {
-            return new Die("die"+diceIndex, imageView);
+        public static Die create(ImageView imageView, List<Drawable> imageCache) {
+            return new Die(imageView, imageCache);
         }
 
+        /**
+         * Roll dice and update image.
+         */
         public int getRoll() {
-            currentValue = rand.nextInt(MAX_DIE_VALUE+1);
-            return currentValue;
-        }
-
-        public String getName() {
-            return name;
+            int randInt = rand.nextInt(MainActivity.MAX_FACE_VALUE + 1);
+            int imageIndex = randInt == 0 ? 1 : randInt - 1;
+            imageView.setImageDrawable(imageCache.get(imageIndex));
+            faceValue = imageIndex + 1;
+            return faceValue;
         }
     }
 }
