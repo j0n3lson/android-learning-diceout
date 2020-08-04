@@ -122,7 +122,7 @@ public class MainActivity extends AppCompatActivity {
         int scoreDelta = computeScore(allRollValues);
         String scoreMessage;
         if(scoreDelta > 0 ){
-            scoreMessage = String.format("Score: %d", scoreDelta);
+            scoreMessage = "Nice you scored some points!";
         } else {
             scoreMessage = "You didn't score this roll. Try again!";
         }

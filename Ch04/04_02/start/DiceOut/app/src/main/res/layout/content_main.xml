@@ -5,10 +5,11 @@
     android:id="@+id/content_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:background="@android:color/holo_green_dark"
     android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.example.diceout.MainActivity"
     tools:showIn="@layout/activity_main">
@@ -17,39 +18,40 @@
         android:id="@+id/rollResult"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Let's Play!" />
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="14dp"
+        android:text="Let's Play!"
+        android:textColor="@android:color/background_light" />
 
     <ImageView
         android:id="@+id/die1Image"
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_below="@id/rollResult"
-        android:layout_margin="25dp"
         android:layout_alignParentLeft="true"
-        android:src="@drawable/die_1"
-         />
+        android:layout_margin="25dp"
+        android:src="@drawable/die_1" />
 
     <ImageView
         android:id="@+id/die2Image"
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_below="@id/rollResult"
-        android:layout_margin="25dp"
-        android:layout_marginLeft="25dp"
-        android:layout_marginRight="25dp"
         android:layout_centerHorizontal="true"
-        android:src="@drawable/die_1"
-        />
+        android:layout_margin="25dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:src="@drawable/die_1" />
 
     <ImageView
         android:id="@+id/die3Image"
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_below="@id/rollResult"
-        android:layout_margin="25dp"
         android:layout_alignParentRight="true"
-        android:src="@drawable/die_1"
-        />
+        android:layout_margin="25dp"
+        android:src="@drawable/die_1" />
 
     <TextView
         android:id="@+id/scoreText"
@@ -59,6 +61,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="50dp"
         android:text="Score: 0"
-        android:textAppearance="@style/TextAppearance.AppCompat.Display1" />
+        android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+        android:textColor="@android:color/background_light" />
 
 </RelativeLayout>
