@@ -8,6 +8,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -20,7 +21,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static java.util.stream.Collectors.toList;
@@ -118,11 +122,41 @@ public class MainActivity extends AppCompatActivity {
 
         // Update the app to display the result value
         viewRollResult.setText(messageBuilder.toString());
-        viewScoreText.setText(String.format("Score: %d", computScore(allRollValues)));
+        int scoreDelta = computeScore(allRollValues);
+        String scoreMessage;
+        if(scoreDelta > 0 ){
+            scoreMessage = String.format("Score: %d", scoreDelta);
+        } else {
+            scoreMessage = "You didn't score this roll. Try again!";
+        }
+        Toast.makeText(getApplicationContext(), scoreMessage, Toast.LENGTH_SHORT).show();
+        viewScoreText.setText(String.format("Score: %d", scoreDelta));
     }
 
-    private int computScore(ArrayList<Integer> allRollValues) {
-        return -1;
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private int computeScore(ArrayList<Integer> allRollValues) {
+
+        // Should probably bounds check the input array.
+        Map<Integer, Long> faceValueFrequencies = allRollValues
+                .stream()
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+
+        int sum = 0;
+        for(Integer faceValue : faceValueFrequencies.keySet()){
+            int frequency = faceValueFrequencies.get(faceValue).intValue();
+            switch(frequency) {
+                case 2:
+                    sum +=  50;
+                    break;
+                case 3:
+                    sum += faceValue *100;
+                    break;
+                default:
+                    Log.i("scoring", "Ignoring face value because frequency is out of bounds");
+                    break;
+            }
+        }
+        return sum;
     }
 
     @Override
