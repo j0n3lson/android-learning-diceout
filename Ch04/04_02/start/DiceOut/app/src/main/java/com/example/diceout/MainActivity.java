@@ -37,7 +37,6 @@ public class MainActivity extends AppCompatActivity {
     // View Objects
     TextView viewRollResult;
     TextView viewScoreText;
-    Button rollButton;
 
     // Model Objects
     List<Die> dice;
@@ -54,14 +53,12 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                rollDice(view);
             }
         });
 
         viewRollResult = (TextView) findViewById(R.id.rollResult);
         viewScoreText = (TextView) findViewById(R.id.scoreText);
-        rollButton = (Button) findViewById(R.id.rollButton);
 
         // Load all the images at once.
         List<Drawable> imageCache = IntStream.range(1, MAX_FACE_VALUE+1).mapToObj(faceValue -> loadImageFile(faceValue)).collect(toList());
